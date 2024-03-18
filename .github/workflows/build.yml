@@ -12,12 +12,6 @@ jobs:
         targetPlatform:
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
     steps:
-      #Adding SSH known host?
-      - name: 'Add GitHub to the SSH known hosts file'
-        run: |
-            mkdir -p -m 0700 /home/runner/.ssh
-            curl --silent https://api.github.com/meta | jq --raw-output '"github.com "+.ssh_keys[]' >> /home/runner/.ssh/known_hosts
-            chmod 600 /home/runner/.ssh/known_hosts
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,12 +23,6 @@ jobs:
           restore-keys: Library-
       - if: matrix.targetPlatform == 'Android'
         uses: jlumbroso/free-disk-space@v1.3.1
-      #Access Private Repo using the SSH Key
-      - name: Accessing private repos
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -42,13 +30,11 @@ jobs:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
-          #SSH socket for the builder to work
-          sshAgent: ${{ env.SSH_AUTH_SOCK }}
-          
       - uses: actions/upload-artifact@v3
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
+          
       # Return License
       - name: Return license
         uses: game-ci/unity-return-license@v2
