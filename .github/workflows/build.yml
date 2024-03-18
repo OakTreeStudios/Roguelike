@@ -12,6 +12,12 @@ jobs:
         targetPlatform:
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
     steps:
+      #Adding SSH known host?
+      - name: 'Add GitHub to the SSH known hosts file'
+        run: |
+            mkdir -p -m 0700 /home/runner/.ssh
+            curl --silent https://api.github.com/meta | jq --raw-output '"github.com "+.ssh_keys[]' >> /home/runner/.ssh/known_hosts
+            chmod 600 /home/runner/.ssh/known_hosts
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
