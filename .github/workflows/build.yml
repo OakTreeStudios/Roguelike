@@ -12,6 +12,10 @@ jobs:
         targetPlatform:
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
     steps:
+      #Verify license is valid
+      - name: Unity - Activate
+        uses: game-ci/unity-activate@v2.0.0
+    
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
