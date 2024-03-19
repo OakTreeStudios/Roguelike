@@ -31,6 +31,11 @@ jobs:
         with:
             targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
 
+      # Return License
+      - name: Return license
+        uses: game-ci/unity-return-license@v2
+        if: always()
+
       # Output
       - uses: actions/upload-artifact@v3
         with:
