@@ -1,13 +1,10 @@
-using System;
 using UnityEngine;
 
 /*
 * This script is used to control the player's actions/inputs
 */
 
-// const float GRAVITY = 9.8f;
-
-public class PlayerController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
 
     //Player Rigidbody
@@ -27,6 +24,7 @@ public class PlayerController : MonoBehaviour
     
     public Transform groundCheck;
     public LayerMask groundLayer;
+    public float fallMultiplier = 2.5f;
     private bool isGrounded;
 
     private bool jumping = false;
@@ -64,6 +62,7 @@ public class PlayerController : MonoBehaviour
 
         PlayerJump();
     }
+
 
     //Function for managing player running (horizontal movement)
     private void PlayerRun() {
