@@ -13,23 +13,24 @@ public class PlayerMovementController : MonoBehaviour
     //Player input variables
     private Vector2 inputMovement;
     
-    //Player Run Variables
+    [Header("Player Run")]
     public float movementSpeed  = 9.0f;
     public float acceleration   = 9.0f;
     public float deceleration   = 9.0f;
-    public float  velocityPower  = 1.2f;
+    public float velocityPower  = 1.2f;
 
-    //Player Jump Variables
-    public float jumpForce = 12.0f;
-    
+    [Header("Player Jump")]
+    public float jumpForce          = 12.0f;
+    public float jumpCutMultiplier  = 0.1f;
     public Transform groundCheck;
     public LayerMask groundLayer;
-    public float fallMultiplier = 2.5f;
     private bool isGrounded;
+    private bool jumpInput          = false;
+    private bool jumpInputReleased  = false;
+    private bool isJumping          = false;
 
-    private bool jumping = false;
 
-
+    
 
     // Start is called before the first rendered frame update
     void Start()
@@ -41,13 +42,24 @@ public class PlayerMovementController : MonoBehaviour
     void Update()
     {
         //Get our player's inputs
-        inputMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        inputMovement = new Vector2( Input.GetAxis( "Horizontal" ), Input.GetAxis( "Vertical" ) );
 
-        isGrounded = Physics2D.OverlapCapsule(groundCheck.position, new Vector2(1.0f, 0.1f), CapsuleDirection2D.Horizontal, 0.0f, groundLayer);
+        //Check if the player is grounded
+        isGrounded = Physics2D.OverlapCapsule( 
+            groundCheck.position, 
+            new Vector2( 1.0f, 0.1f ), 
+            CapsuleDirection2D.Horizontal, 
+            0.0f, 
+            groundLayer 
+        );
 
-        //Check if the player has pressed the jump button and the player is grounded
-        if(Input.GetButtonDown("Jump") && isGrounded) {
-            jumping = true;
+        //Set Jump Input if the player presses the jump button and is grounded
+        if( Input.GetButtonDown( "Jump" ) && isGrounded ) {
+            jumpInput = true;
+        }
+
+        if( Input.GetButtonUp( "Jump" ) ) {
+            jumpInputReleased = true;
         }
     }
 
@@ -61,6 +73,8 @@ public class PlayerMovementController : MonoBehaviour
         PlayerRun();
 
         PlayerJump();
+
+        if(jumpInputReleased) { JumpCut(); }
     }
 
 
@@ -75,25 +89,34 @@ public class PlayerMovementController : MonoBehaviour
         float speedDifference = targetSpeed - playerRb.velocity.x;
 
         //Find our acceleration rate depending on the situation (Accelerating or decelerating)
-        float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
+        float accelerationRate = ( Mathf.Abs( targetSpeed ) > 0.01f ) ? acceleration : deceleration;
 
         //Applies acceleration to speed difference, then raises to a set power so acceleration increases with higher speeds
         //Reapply the velocities direction using sign
-        float movement = Mathf.Pow(Mathf.Abs(speedDifference) * accelerationRate, velocityPower) * Mathf.Sign(speedDifference);
+        float movement = Mathf.Pow( Mathf.Abs( speedDifference ) * accelerationRate, velocityPower ) * Mathf.Sign (speedDifference );
 
         //Add movement forces to player rigidbody
-        playerRb.AddForce(movement * Vector2.right);
+        playerRb.AddForce( movement * Vector2.right );
     }
 
     //Function for managing player jumping
     private void PlayerJump() {
         //If we are not jumping, return
-        if(!jumping) return;
+        if(!jumpInput) return;
 
         //Apply a force if we are jumping
-        playerRb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        jumping = false;
+        playerRb.AddForce( Vector2.up * jumpForce, ForceMode2D.Impulse );
+        jumpInput = false;
+        isJumping = true;
+        jumpInputReleased = false;
         
+    }
+
+    private void JumpCut() {
+        //Check if we are jumping
+        if( playerRb.velocity.y > 0 && isJumping ) {
+            playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocity.y, ForceMode2D.Impulse );
+        }
     }
 
 }
