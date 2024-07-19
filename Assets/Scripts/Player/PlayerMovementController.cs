@@ -7,8 +7,12 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
 
+    #region Variables
     //Player Rigidbody
     public Rigidbody2D playerRb;
+
+    //Gravity Scale
+    private float originalGravityScale;
 
     //Player input variables
     private Vector2 inputMovement;
@@ -22,6 +26,7 @@ public class PlayerMovementController : MonoBehaviour
     [Header("Player Jump")]
     public float jumpForce          = 12.0f;
     public float jumpCutMultiplier  = 0.1f;
+    public float fallGravityMultiplier = 1.9f;
     public Transform groundCheck;
     public LayerMask groundLayer;
     private bool isGrounded;
@@ -29,13 +34,14 @@ public class PlayerMovementController : MonoBehaviour
     private bool jumpInputReleased  = false;
     private bool isJumping          = false;
 
+    #endregion
 
-    
-
+    #region Unity Functions
     // Start is called before the first rendered frame update
     void Start()
     {
-
+        //Get our starting gravity scale
+        originalGravityScale = playerRb.gravityScale;
     }
 
     // Update is called once per frame rendered frame
@@ -62,12 +68,15 @@ public class PlayerMovementController : MonoBehaviour
             jumpInputReleased = true;
         }
     }
-
+    
     //FixedUpdate is called once per physics frame
     void FixedUpdate() {
         MovePlayer();
     }
 
+    #endregion
+
+    #region Player Movement Physics Functions
     //Function for managing player movement
     private void MovePlayer() {
         PlayerRun();
@@ -75,9 +84,12 @@ public class PlayerMovementController : MonoBehaviour
         PlayerJump();
 
         if(jumpInputReleased) { JumpCut(); }
+
+        FallGravity();
     }
+    #endregion
 
-
+    #region Run Functions
     //Function for managing player running (horizontal movement)
     private void PlayerRun() {
         //Following Dawnosaur's calculations for more responsive physics movement: https://www.youtube.com/watch?v=KbtcEVCM7bw
@@ -86,7 +98,7 @@ public class PlayerMovementController : MonoBehaviour
         float targetSpeed = inputMovement.x * movementSpeed;
 
         //Calculate the difference in our current velocity and desired velocity
-        float speedDifference = targetSpeed - playerRb.velocity.x;
+        float speedDifference = targetSpeed - playerRb.velocityX;
 
         //Find our acceleration rate depending on the situation (Accelerating or decelerating)
         float accelerationRate = ( Mathf.Abs( targetSpeed ) > 0.01f ) ? acceleration : deceleration;
@@ -98,7 +110,9 @@ public class PlayerMovementController : MonoBehaviour
         //Add movement forces to player rigidbody
         playerRb.AddForce( movement * Vector2.right );
     }
+    #endregion
 
+    #region Jump Functions
     //Function for managing player jumping
     private void PlayerJump() {
         //If we are not jumping, return
@@ -114,10 +128,21 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerRb.velocity.y > 0 && isJumping ) {
-            playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocity.y, ForceMode2D.Impulse );
+        if( playerRb.velocityY > 0 && isJumping ) {
+            playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocityY, ForceMode2D.Impulse );
         }
     }
+
+    private void FallGravity() {
+        if(playerRb.velocityY < 0) {
+            playerRb.gravityScale = originalGravityScale * fallGravityMultiplier;
+        } else {
+            playerRb.gravityScale = originalGravityScale;
+        }
+    }
+
+    #endregion
+
 
 }
 
