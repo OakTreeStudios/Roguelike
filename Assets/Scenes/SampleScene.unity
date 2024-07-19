@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 44722161}
   - component: {fileID: 44722160}
   - component: {fileID: 44722159}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Small Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 704959318}
   - component: {fileID: 704959317}
   - component: {fileID: 704959316}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -562,11 +562,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c781c2ed74e960b409a7e3893df6cda5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerRb: {fileID: 1290896000}
   movementSpeed: 5
   acceleration: 1.5
   deceleration: 1
   velocityPower: 2
-  playerRb: {fileID: 1290896000}
+  jumpForce: 12
+  groundCheck: {fileID: 1395822327}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!4 &978988142
 Transform:
   m_ObjectHideFlags: 0
@@ -628,7 +633,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!212 &1290896001
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -695,11 +700,12 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1395822327}
   m_Father: {fileID: 978988142}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &1290896003
-BoxCollider2D:
+--- !u!58 &1290896003
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -733,17 +739,38 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.5
+--- !u!1 &1395822326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1395822327}
+  m_Layer: 0
+  m_Name: GroundChecker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1395822327
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395822326}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1290896002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1465953060
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,7 +923,7 @@ GameObject:
   - component: {fileID: 1974030258}
   - component: {fileID: 1974030257}
   - component: {fileID: 1974030256}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Medium Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}

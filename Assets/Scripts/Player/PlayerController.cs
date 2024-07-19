@@ -10,7 +10,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    //Player Rigidbody
     public Rigidbody2D playerRb;
+
+    //Player input variables
+    private Vector2 inputMovement;
     
     //Player Run Variables
     public float movementSpeed  = 9.0f;
@@ -21,12 +25,13 @@ public class PlayerController : MonoBehaviour
     //Player Jump Variables
     public float jumpForce = 12.0f;
     
-    
+    public Transform groundCheck;
+    public LayerMask groundLayer;
+    private bool isGrounded;
 
-    //Private script variabes
     private bool jumping = false;
-    private Vector2 inputMovement;
-    
+
+
 
     // Start is called before the first rendered frame update
     void Start()
@@ -40,8 +45,10 @@ public class PlayerController : MonoBehaviour
         //Get our player's inputs
         inputMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        //Check if the player has pressed the jump button
-        if(Input.GetButtonDown("Jump")) {
+        isGrounded = Physics2D.OverlapCapsule(groundCheck.position, new Vector2(1.0f, 0.1f), CapsuleDirection2D.Horizontal, 0.0f, groundLayer);
+
+        //Check if the player has pressed the jump button and the player is grounded
+        if(Input.GetButtonDown("Jump") && isGrounded) {
             jumping = true;
         }
     }
