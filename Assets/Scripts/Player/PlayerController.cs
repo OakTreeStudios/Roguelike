@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 /*
@@ -23,36 +24,32 @@ public class PlayerController : MonoBehaviour
     //Private script variabes
     
 
-    // Start is called before the first frame update
+    // Start is called before the first rendered frame update
     void Start()
     {
 
     }
 
-    // Update is called once per frame
+    // Update is called once per frame rendered frame
     void Update()
     {
+ 
+    }
+
+    //FixedUpdate is called once per physics frame
+    void FixedUpdate() {
         MovePlayer();
-        
-        
     }
 
     //Function for managing player movement
     private void MovePlayer() {
-        //Move player Left
-        if(Input.GetKey(KeyCode.A)) {
-            Debug.Log("-- A key was pressed");
-            playerRb.velocity = new Vector2(-speed, playerRb.velocity.y);
-        } 
-        //Move player Right
-        if(Input.GetKey(KeyCode.D)) {
-            Debug.Log("-- D key was pressed");
-            playerRb.velocity = new Vector2(speed, playerRb.velocity.y);
-        }
-
-        //Move player Up
-        //Move player Down
-
+        //Add force to player rigidbody using input
+        playerRb.MovePosition(
+            playerRb.position + new Vector2(
+                Input.GetAxis("Horizontal") * speed * Time.fixedDeltaTime,  //X axis movement
+                Input.GetAxis("Vertical") * speed * Time.fixedDeltaTime     //Y axis movement
+            )
+        );
     }
 
 }
