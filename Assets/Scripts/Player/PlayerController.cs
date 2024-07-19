@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviour
     //public float jumpForce = 5.0f;
     public Rigidbody2D playerRb;
 
-
     //Private script variabes
+    private Vector2 playerMovement;
     
 
     // Start is called before the first rendered frame update
@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame rendered frame
     void Update()
     {
+        //Get our player's inputs
+        playerMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")); 
  
     }
 
@@ -43,11 +45,11 @@ public class PlayerController : MonoBehaviour
 
     //Function for managing player movement
     private void MovePlayer() {
-        //Add force to player rigidbody using input
+        //Add movement forces to player rigidbody
         playerRb.MovePosition(
             playerRb.position + new Vector2(
-                Input.GetAxis("Horizontal") * speed * Time.fixedDeltaTime,  //X axis movement
-                Input.GetAxis("Vertical") * speed * Time.fixedDeltaTime     //Y axis movement
+                playerMovement.x * speed * Time.fixedDeltaTime,  //X axis movement
+                playerMovement.y * speed * Time.fixedDeltaTime     //Y axis movement
             )
         );
     }
