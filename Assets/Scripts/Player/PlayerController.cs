@@ -46,12 +46,7 @@ public class PlayerController : MonoBehaviour
     //Function for managing player movement
     private void MovePlayer() {
         //Add movement forces to player rigidbody
-        playerRb.MovePosition(
-            playerRb.position + new Vector2(
-                playerMovement.x * speed * Time.fixedDeltaTime,  //X axis movement
-                playerMovement.y * speed * Time.fixedDeltaTime     //Y axis movement
-            )
-        );
+        playerRb.AddForce(playerMovement * speed);
     }
 
 }
