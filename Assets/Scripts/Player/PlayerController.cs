@@ -1,10 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor.Callbacks;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /*
 * This script is used to control the player's actions/inputs
@@ -17,10 +11,10 @@ public class PlayerController : MonoBehaviour
 
     
     //Public script variables
-    public float movementSpeed  = 5.0f;
-    public float acceleration   = 1.0f;
-    public float deceleration   = 1.0f;
-    public float  velocityPower  = 2.0f;
+    public float movementSpeed  = 9.0f;
+    public float acceleration   = 9.0f;
+    public float deceleration   = 9.0f;
+    public float  velocityPower  = 1.2f;
     
     //public float jumpForce = 5.0f;
     public Rigidbody2D playerRb;
