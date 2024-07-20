@@ -563,11 +563,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerRb: {fileID: 1290896000}
-  movementSpeed: 5
-  acceleration: 1.5
-  deceleration: 1
-  velocityPower: 2
+  movementSpeed: 9
+  acceleration: 9
+  deceleration: 9
+  velocityPower: 1.2
+  frictionFactor: 0.2
   jumpForce: 12
+  jumpCutMultiplier: 0.1
+  fallGravityMultiplier: 1.9
+  jumpCoyoteTime: 0.35
   groundCheck: {fileID: 1395822327}
   groundLayer:
     serializedVersion: 2
