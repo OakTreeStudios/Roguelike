@@ -1,4 +1,3 @@
-using UnityEditor.Callbacks;
 using UnityEngine;
 
 /*
@@ -25,18 +24,21 @@ public class PlayerMovementController : MonoBehaviour
     public float velocityPower  = 1.2f;
     public float frictionFactor = 0.2f;
 
-    private bool stopFriction = false;
+    private bool stopFriction   = false;
 
     [Header("Player Jump")]
-    public float jumpForce          = 12.0f;
-    public float jumpCutMultiplier  = 0.1f;
-    public float fallGravityMultiplier = 1.9f;
+    public float jumpForce              = 12.0f;
+    public float jumpCutMultiplier      = 0.1f;
+    public float fallGravityMultiplier  = 1.9f;
+    public float jumpCoyoteTime         = 0.35f;
     public Transform groundCheck;
     public LayerMask groundLayer;
+    private float lastJumpTime          = 0.0f;
+    private float lastGroundedTime      = 0.0f;
     private bool isGrounded;
-    private bool jumpInput          = false;
-    private bool jumpInputReleased  = false;
-    private bool isJumping          = false;
+    private bool jumpInput              = false;
+    private bool jumpInputReleased      = false;
+    private bool isJumping              = false;
 
     #endregion
 
@@ -51,6 +53,10 @@ public class PlayerMovementController : MonoBehaviour
     // Update is called once per frame rendered frame
     void Update()
     {
+        //Timers
+        lastJumpTime += Time.deltaTime;
+        lastGroundedTime += Time.deltaTime;
+        
         //Get our player's inputs for movement
         inputMovement = new Vector2( Input.GetAxis( "Horizontal" ), Input.GetAxis( "Vertical" ) );
 
@@ -63,9 +69,15 @@ public class PlayerMovementController : MonoBehaviour
             groundLayer 
         );
 
-        //Set Jump Input if the player presses the jump button and is grounded
-        if( Input.GetButtonDown( "Jump" ) && isGrounded ) {
+        if( isGrounded ) {
+            lastGroundedTime = 0.0f;
+            isJumping = false;
+        }
+
+        //Set Jump Input if the player presses the jump button and is grounded or within the coyote time
+        if( Input.GetButtonDown( "Jump" ) && (isGrounded || lastGroundedTime < jumpCoyoteTime) ) {
             jumpInput = true;
+            lastJumpTime = 0.0f;
         }
 
         if( Input.GetButtonUp( "Jump" ) ) {
@@ -154,6 +166,7 @@ public class PlayerMovementController : MonoBehaviour
         //Apply a force if we are jumping
         playerRb.AddForce( Vector2.up * jumpForce, ForceMode2D.Impulse );
         jumpInput = false;
+        lastJumpTime = 0.0f;
         isJumping = true;
         jumpInputReleased = false;
         
@@ -161,7 +174,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerRb.velocityY > 0 && isJumping && jumpInputReleased) {
+        if( playerRb.velocityY > 0 /*&& isJumping*/ && jumpInputReleased) {
             playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocityY, ForceMode2D.Impulse );
         }
     }
