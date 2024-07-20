@@ -1,3 +1,4 @@
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 /*
@@ -22,6 +23,9 @@ public class PlayerMovementController : MonoBehaviour
     public float acceleration   = 9.0f;
     public float deceleration   = 9.0f;
     public float velocityPower  = 1.2f;
+    public float frictionFactor = 0.2f;
+
+    private bool stopFriction = false;
 
     [Header("Player Jump")]
     public float jumpForce          = 12.0f;
@@ -47,7 +51,7 @@ public class PlayerMovementController : MonoBehaviour
     // Update is called once per frame rendered frame
     void Update()
     {
-        //Get our player's inputs
+        //Get our player's inputs for movement
         inputMovement = new Vector2( Input.GetAxis( "Horizontal" ), Input.GetAxis( "Vertical" ) );
 
         //Check if the player is grounded
@@ -67,6 +71,14 @@ public class PlayerMovementController : MonoBehaviour
         if( Input.GetButtonUp( "Jump" ) ) {
             jumpInputReleased = true;
         }
+
+        //Stop friction for player movement (No input and grounded)
+        if ( isGrounded 
+            && Input.GetAxisRaw( "Horizontal" ) == 0.0f 
+            && Input.GetAxisRaw( "Vertical" ) == 0.0f 
+        ) {
+            stopFriction = true;
+        }
     }
     
     //FixedUpdate is called once per physics frame
@@ -81,9 +93,11 @@ public class PlayerMovementController : MonoBehaviour
     private void MovePlayer() {
         PlayerRun();
 
+        StopFriction();
+
         PlayerJump();
 
-        if(jumpInputReleased) { JumpCut(); }
+        JumpCut();
 
         FallGravity();
     }
@@ -110,6 +124,25 @@ public class PlayerMovementController : MonoBehaviour
         //Add movement forces to player rigidbody
         playerRb.AddForce( movement * Vector2.right );
     }
+
+    private void StopFriction() {
+        //Following Dawnosaur's calculations for more responsive physics movement: https://www.youtube.com/watch?v=KbtcEVCM7bw
+
+        //Check if we should stop friction (Velocity is 0 and grounded)
+        if(playerRb.velocity == Vector2.zero && isGrounded) {
+            stopFriction = false;
+        }
+
+        //If we are applying stop friction, calculate the amount of friction to apply
+        if( stopFriction ) {
+            float amount = Mathf.Min( Mathf.Abs( playerRb.velocityX ), frictionFactor );
+
+            amount *= Mathf.Sign( playerRb.velocityX );
+
+            playerRb.AddForce( -amount * Vector2.right, ForceMode2D.Impulse);
+        }
+    }
+
     #endregion
 
     #region Jump Functions
@@ -128,7 +161,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerRb.velocityY > 0 && isJumping ) {
+        if( playerRb.velocityY > 0 && isJumping && jumpInputReleased) {
             playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocityY, ForceMode2D.Impulse );
         }
     }
