@@ -91,6 +91,11 @@ public class PlayerMovementController : MonoBehaviour
         ) {
             stopFriction = true;
         }
+
+        //If we are not moving and grounded, stop friction
+        if( ( playerRb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded) {
+            stopFriction = false;
+        }
     }
     
     //FixedUpdate is called once per physics frame
@@ -140,13 +145,9 @@ public class PlayerMovementController : MonoBehaviour
     private void StopFriction() {
         //Following Dawnosaur's calculations for more responsive physics movement: https://www.youtube.com/watch?v=KbtcEVCM7bw
 
-        //Check if we should stop friction (Velocity is 0 and grounded)
-        if(playerRb.velocity == Vector2.zero && isGrounded) {
-            stopFriction = false;
-        }
-
         //If we are applying stop friction, calculate the amount of friction to apply
         if( stopFriction ) {
+            Debug.Log("Stop Friction");
             float amount = Mathf.Min( Mathf.Abs( playerRb.velocityX ), frictionFactor );
 
             amount *= Mathf.Sign( playerRb.velocityX );
