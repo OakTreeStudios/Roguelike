@@ -84,14 +84,6 @@ public class PlayerMovementController : MonoBehaviour
             jumpInputReleased = true;
         }
 
-        //Stop friction for player movement (No input and grounded)
-        if ( isGrounded 
-            && Input.GetAxisRaw( "Horizontal" ) == 0.0f 
-            && Input.GetAxisRaw( "Vertical" ) == 0.0f 
-        ) {
-            stopFriction = true;
-        }
-
         //If we are not moving and grounded, stop friction
         if( ( playerRb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded) {
             stopFriction = false;
@@ -147,7 +139,6 @@ public class PlayerMovementController : MonoBehaviour
 
         //If we are applying stop friction, calculate the amount of friction to apply
         if( stopFriction ) {
-            Debug.Log("Stop Friction");
             float amount = Mathf.Min( Mathf.Abs( playerRb.velocityX ), frictionFactor );
 
             amount *= Mathf.Sign( playerRb.velocityX );
