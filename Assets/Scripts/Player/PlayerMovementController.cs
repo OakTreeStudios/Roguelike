@@ -63,7 +63,7 @@ public class PlayerMovementController : MonoBehaviour
         //Check if the player is grounded
         isGrounded = Physics2D.OverlapCapsule( 
             groundCheck.position, 
-            new Vector2( 1.0f, 0.1f ), 
+            new Vector2( 0.8f, 0.1f ), 
             CapsuleDirection2D.Horizontal, 
             0.0f, 
             groundLayer 
