@@ -173,7 +173,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerRb.velocityY > 0 /*&& isJumping*/ && jumpInputReleased) {
+        if( playerRb.velocityY > 0 && jumpInputReleased) {
             playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocityY, ForceMode2D.Impulse );
         }
     }
