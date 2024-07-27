@@ -572,10 +572,12 @@ MonoBehaviour:
   jumpCutMultiplier: 0.1
   fallGravityMultiplier: 1.9
   jumpCoyoteTime: 0.35
+  numberOfJumps: 1
   groundCheck: {fileID: 1395822327}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  currentJumps: 0
 --- !u!4 &978988142
 Transform:
   m_ObjectHideFlags: 0

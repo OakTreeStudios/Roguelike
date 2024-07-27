@@ -31,8 +31,11 @@ public class PlayerMovementController : MonoBehaviour
     public float jumpCutMultiplier      = 0.1f;
     public float fallGravityMultiplier  = 1.9f;
     public float jumpCoyoteTime         = 0.35f;
+    public int numberOfJumps            = 1;
+    public float jumpWaitTime           = 0.15f;
     public Transform groundCheck;
     public LayerMask groundLayer;
+    private int currentJumps            = 0;
     private float lastJumpTime          = 0.0f;
     private float lastGroundedTime      = 0.0f;
     private bool isGrounded;
@@ -69,15 +72,9 @@ public class PlayerMovementController : MonoBehaviour
             groundLayer 
         );
 
-        if( isGrounded ) {
-            lastGroundedTime = 0.0f;
-            isJumping = false;
-        }
-
         //Set Jump Input if the player presses the jump button and is grounded or within the coyote time
-        if( Input.GetButtonDown( "Jump" ) && (isGrounded || lastGroundedTime < jumpCoyoteTime) ) {
+        if( Input.GetButtonDown( "Jump" ) && (isGrounded  || currentJumps < numberOfJumps) ) {
             jumpInput = true;
-            lastJumpTime = 0.0f;
         }
 
         if( Input.GetButtonUp( "Jump" ) ) {
@@ -92,6 +89,8 @@ public class PlayerMovementController : MonoBehaviour
     
     //FixedUpdate is called once per physics frame
     void FixedUpdate() {
+
+        GroundedCheck();
         MovePlayer();
     }
 
@@ -152,16 +151,24 @@ public class PlayerMovementController : MonoBehaviour
     #region Jump Functions
     //Function for managing player jumping
     private void PlayerJump() {
-        //If we are not jumping, return
-        if(!jumpInput) return;
 
         //Apply a force if we are jumping
-        playerRb.AddForce( Vector2.up * jumpForce, ForceMode2D.Impulse );
-        jumpInput = false;
-        lastJumpTime = 0.0f;
-        isJumping = true;
-        jumpInputReleased = false;
-        
+        if( CanJump() ) {
+            float force = jumpForce;
+
+            //Check if we are falling, if we are then we will adjust the force to make the jump be the same height
+            if( playerRb.velocityY < 0 ) {
+                force -= playerRb.velocityY;
+            }
+
+            playerRb.AddForce( Vector2.up * force, ForceMode2D.Impulse );
+
+            jumpInput = false;
+            lastJumpTime = 0.0f;
+            isJumping = true;
+            jumpInputReleased = false;
+            currentJumps++;
+        }
     }
 
     private void JumpCut() {
@@ -177,6 +184,27 @@ public class PlayerMovementController : MonoBehaviour
         } else {
             playerRb.gravityScale = originalGravityScale;
         }
+    }
+
+    private void GroundedCheck() {
+        if( isGrounded ) {
+            lastGroundedTime = 0.0f;
+            isJumping = false;
+            currentJumps = 0;
+        }
+    }
+
+    #endregion
+
+    #region Ability Checks
+
+    //Function that returns wether or not the jumping condition is met.
+    bool CanJump() {
+        return jumpInput 
+        //Check if we have jumps left
+        && currentJumps < numberOfJumps 
+        //Check if it has been enough time between jumps
+        && lastJumpTime > jumpWaitTime;
     }
 
     #endregion
