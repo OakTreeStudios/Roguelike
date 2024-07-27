@@ -7,9 +7,8 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
 
+    public PlayerStats playerStats;
     #region Variables
-    //Player Rigidbody
-    public Rigidbody2D playerRb;
 
     //Gravity Scale
     private float originalGravityScale;
@@ -18,7 +17,6 @@ public class PlayerMovementController : MonoBehaviour
     private Vector2 inputMovement;
     
     [Header("Player Run")]
-    public float movementSpeed  = 9.0f;
     public float acceleration   = 9.0f;
     public float deceleration   = 9.0f;
     public float velocityPower  = 1.2f;
@@ -27,11 +25,10 @@ public class PlayerMovementController : MonoBehaviour
     private bool stopFriction   = false;
 
     [Header("Player Jump")]
-    public float jumpForce              = 12.0f;
     public float jumpCutMultiplier      = 0.1f;
     public float fallGravityMultiplier  = 1.9f;
     public float jumpCoyoteTime         = 0.35f;
-    public int numberOfJumps            = 1;
+    //public int numberOfJumps            = 1;
     public float jumpWaitTime           = 0.15f;
     public Transform groundCheck;
     public LayerMask groundLayer;
@@ -50,7 +47,7 @@ public class PlayerMovementController : MonoBehaviour
     void Start()
     {
         //Get our starting gravity scale
-        originalGravityScale = playerRb.gravityScale;
+        originalGravityScale = playerStats.rb.gravityScale;
     }
 
     // Update is called once per frame rendered frame
@@ -73,7 +70,7 @@ public class PlayerMovementController : MonoBehaviour
         );
 
         //Set Jump Input if the player presses the jump button and is grounded or within the coyote time
-        if( Input.GetButtonDown( "Jump" ) && (isGrounded  || currentJumps < numberOfJumps) ) {
+        if( Input.GetButtonDown( "Jump" ) && (isGrounded  || currentJumps < playerStats.numberOfJumps) ) {
             jumpInput = true;
         }
 
@@ -82,7 +79,7 @@ public class PlayerMovementController : MonoBehaviour
         }
 
         //If we are not moving and grounded, stop friction
-        if( ( playerRb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded) {
+        if( ( playerStats.rb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded) {
             stopFriction = false;
         }
     }
@@ -117,10 +114,10 @@ public class PlayerMovementController : MonoBehaviour
         //Following Dawnosaur's calculations for more responsive physics movement: https://www.youtube.com/watch?v=KbtcEVCM7bw
 
         //Calculate our intended velocity
-        float targetSpeed = inputMovement.x * movementSpeed;
+        float targetSpeed = inputMovement.x * playerStats.movementSpeed;
 
         //Calculate the difference in our current velocity and desired velocity
-        float speedDifference = targetSpeed - playerRb.velocityX;
+        float speedDifference = targetSpeed - playerStats.rb.velocityX;
 
         //Find our acceleration rate depending on the situation (Accelerating or decelerating)
         float accelerationRate = ( Mathf.Abs( targetSpeed ) > 0.01f ) ? acceleration : deceleration;
@@ -130,7 +127,7 @@ public class PlayerMovementController : MonoBehaviour
         float movement = Mathf.Pow( Mathf.Abs( speedDifference ) * accelerationRate, velocityPower ) * Mathf.Sign (speedDifference );
 
         //Add movement forces to player rigidbody
-        playerRb.AddForce( movement * Vector2.right );
+        playerStats.rb.AddForce( movement * Vector2.right );
     }
 
     private void StopFriction() {
@@ -138,11 +135,11 @@ public class PlayerMovementController : MonoBehaviour
 
         //If we are applying stop friction, calculate the amount of friction to apply
         if( stopFriction ) {
-            float amount = Mathf.Min( Mathf.Abs( playerRb.velocityX ), frictionFactor );
+            float amount = Mathf.Min( Mathf.Abs( playerStats.rb.velocityX ), frictionFactor );
 
-            amount *= Mathf.Sign( playerRb.velocityX );
+            amount *= Mathf.Sign( playerStats.rb.velocityX );
 
-            playerRb.AddForce( -amount * Vector2.right, ForceMode2D.Impulse);
+            playerStats.rb.AddForce( -amount * Vector2.right, ForceMode2D.Impulse);
         }
     }
 
@@ -154,14 +151,14 @@ public class PlayerMovementController : MonoBehaviour
 
         //Apply a force if we are jumping
         if( CanJump() ) {
-            float force = jumpForce;
+            float force = playerStats.jumpForce;
 
             //Check if we are falling, if we are then we will adjust the force to make the jump be the same height
-            if( playerRb.velocityY < 0 ) {
-                force -= playerRb.velocityY;
+            if( playerStats.rb.velocityY < 0 ) {
+                force -= playerStats.rb.velocityY;
             }
 
-            playerRb.AddForce( Vector2.up * force, ForceMode2D.Impulse );
+            playerStats.rb.AddForce( Vector2.up * force, ForceMode2D.Impulse );
 
             jumpInput = false;
             lastJumpTime = 0.0f;
@@ -173,16 +170,16 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerRb.velocityY > 0 && jumpInputReleased) {
-            playerRb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerRb.velocityY, ForceMode2D.Impulse );
+        if( playerStats.rb.velocityY > 0 && jumpInputReleased) {
+            playerStats.rb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerStats.rb.velocityY, ForceMode2D.Impulse );
         }
     }
 
     private void FallGravity() {
-        if(playerRb.velocityY < 0) {
-            playerRb.gravityScale = originalGravityScale * fallGravityMultiplier;
+        if(playerStats.rb.velocityY < 0) {
+            playerStats.rb.gravityScale = originalGravityScale * fallGravityMultiplier;
         } else {
-            playerRb.gravityScale = originalGravityScale;
+            playerStats.rb.gravityScale = originalGravityScale;
         }
     }
 
@@ -202,7 +199,7 @@ public class PlayerMovementController : MonoBehaviour
     bool CanJump() {
         return jumpInput 
         //Check if we have jumps left
-        && currentJumps < numberOfJumps 
+        && currentJumps < playerStats.numberOfJumps 
         //Check if it has been enough time between jumps
         && lastJumpTime > jumpWaitTime;
     }
