@@ -386,7 +386,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1290896002}
-  cameraSpeed: 1
+  cameraSpeed: 4
+  lookAheadDistance: 5
+  lookAheadLerp: 0.8
 --- !u!1 &680993329
 GameObject:
   m_ObjectHideFlags: 0
