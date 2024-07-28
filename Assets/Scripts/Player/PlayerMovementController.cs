@@ -194,13 +194,13 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( CanJumpCut()) {
+        if( CanJumpCut() ) {
             playerStats.rb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerStats.rb.velocityY, ForceMode2D.Impulse );
         }
     }
 
     private void FallGravity() {
-        if(playerStats.rb.velocityY < 0) {
+        if( playerStats.rb.velocityY < 0 ) {
             playerStats.rb.gravityScale = originalGravityScale * fallGravityMultiplier;
         } else {
             playerStats.rb.gravityScale = originalGravityScale;
@@ -222,7 +222,7 @@ public class PlayerMovementController : MonoBehaviour
 
     void PlayerWallJump() {
         //If we are touching a wall and not grounded, we can wall jump
-        if( isTouchingWall && !isGrounded && jumpInput) {
+        if( CanWallJump() ) {
 
             Vector2 force = new Vector2( -Mathf.Sign( Input.GetAxis("Horizontal") ) * playerStats.movementSpeed, playerStats.wallJumpForce );
 
@@ -264,8 +264,13 @@ public class PlayerMovementController : MonoBehaviour
         && jumpInputReleased;
     }
 
-    #endregion
+    bool CanWallJump() {
+        return isTouchingWall 
+        && !isGrounded 
+        && jumpInput;
+    }
 
+    #endregion
 
 }
 
