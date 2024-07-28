@@ -28,7 +28,6 @@ public class PlayerMovementController : MonoBehaviour
     public float jumpCutMultiplier      = 0.1f;
     public float fallGravityMultiplier  = 1.9f;
     public float jumpCoyoteTime         = 0.35f;
-    //public int numberOfJumps            = 1;
     public float jumpWaitTime           = 0.15f;
     public Transform groundCheck;
     public LayerMask groundLayer;
@@ -39,6 +38,11 @@ public class PlayerMovementController : MonoBehaviour
     private bool jumpInput              = false;
     private bool jumpInputReleased      = false;
     private bool isJumping              = false;
+
+    [Header("Player Wall Jump")]
+    public Transform wallCheck;
+    private bool isTouchingWall         = false;
+    private bool isWallJumping          = false;
 
     #endregion
 
@@ -69,8 +73,17 @@ public class PlayerMovementController : MonoBehaviour
             groundLayer 
         );
 
+        //Check if the player is touching a wall
+        isTouchingWall = Physics2D.OverlapCapsule( 
+            wallCheck.position, 
+            new Vector2( 1.2f, 0.8f ), 
+            CapsuleDirection2D.Horizontal, 
+            0.0f, 
+            groundLayer 
+        );
+
         //Set Jump Input if the player presses the jump button and is grounded or within the coyote time
-        if( Input.GetButtonDown( "Jump" ) && (isGrounded  || currentJumps < playerStats.numberOfJumps) ) {
+        if( Input.GetButtonDown( "Jump" ) ) {
             jumpInput = true;
         }
 
@@ -79,7 +92,7 @@ public class PlayerMovementController : MonoBehaviour
         }
 
         //If we are not moving and grounded, stop friction
-        if( ( playerStats.rb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded) {
+        if( ( playerStats.rb.velocity == Vector2.zero || Input.GetAxisRaw( "Horizontal" ) != 0.0f ) && isGrounded ) {
             stopFriction = false;
         }
     }
@@ -96,8 +109,13 @@ public class PlayerMovementController : MonoBehaviour
     #region Player Movement Physics Functions
     //Function for managing player movement
     private void MovePlayer() {
-        PlayerRun();
 
+        if( isWallJumping ) {
+            PlayerRun(playerStats.wallJumpLerp);
+        } else {
+            PlayerRun(1.0f);
+        }
+        
         StopFriction();
 
         PlayerJump();
@@ -105,16 +123,21 @@ public class PlayerMovementController : MonoBehaviour
         JumpCut();
 
         FallGravity();
+
+        PlayerWallJump();
     }
     #endregion
 
     #region Run Functions
     //Function for managing player running (horizontal movement)
-    private void PlayerRun() {
+    private void PlayerRun(float lerp) {
         //Following Dawnosaur's calculations for more responsive physics movement: https://www.youtube.com/watch?v=KbtcEVCM7bw
 
         //Calculate our intended velocity
         float targetSpeed = inputMovement.x * playerStats.movementSpeed;
+
+        //Calculate linearinterpolation for smoother movement
+        targetSpeed = Mathf.Lerp( playerStats.rb.velocityX, targetSpeed, lerp );
 
         //Calculate the difference in our current velocity and desired velocity
         float speedDifference = targetSpeed - playerStats.rb.velocityX;
@@ -124,7 +147,7 @@ public class PlayerMovementController : MonoBehaviour
 
         //Applies acceleration to speed difference, then raises to a set power so acceleration increases with higher speeds
         //Reapply the velocities direction using sign
-        float movement = Mathf.Pow( Mathf.Abs( speedDifference ) * accelerationRate, velocityPower ) * Mathf.Sign (speedDifference );
+        float movement = Mathf.Pow( Mathf.Abs( speedDifference ) * accelerationRate, velocityPower ) * Mathf.Sign ( speedDifference );
 
         //Add movement forces to player rigidbody
         playerStats.rb.AddForce( movement * Vector2.right );
@@ -163,6 +186,7 @@ public class PlayerMovementController : MonoBehaviour
             jumpInput = false;
             lastJumpTime = 0.0f;
             isJumping = true;
+            isWallJumping = false;
             jumpInputReleased = false;
             currentJumps++;
         }
@@ -170,7 +194,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void JumpCut() {
         //Check if we are jumping
-        if( playerStats.rb.velocityY > 0 && jumpInputReleased) {
+        if( CanJumpCut()) {
             playerStats.rb.AddForce( Vector2.down * ( 1 - jumpCutMultiplier ) * playerStats.rb.velocityY, ForceMode2D.Impulse );
         }
     }
@@ -188,6 +212,34 @@ public class PlayerMovementController : MonoBehaviour
             lastGroundedTime = 0.0f;
             isJumping = false;
             currentJumps = 0;
+            isWallJumping = false;
+        }
+    }
+
+    #endregion
+
+    #region Wall Jump Functions
+
+    void PlayerWallJump() {
+        //If we are touching a wall and not grounded, we can wall jump
+        if( isTouchingWall && !isGrounded && jumpInput) {
+
+            Vector2 force = new Vector2( -Mathf.Sign( Input.GetAxis("Horizontal") ) * playerStats.movementSpeed, playerStats.wallJumpForce );
+
+            if ( Mathf.Sign( playerStats.rb.velocity.x)  != Mathf.Sign( force.x ) ) {
+                force.x -= playerStats.rb.velocity.x;
+            }
+
+            //If we are falling, we will adjust the force to make the jump be the same height
+            if ( playerStats.rb.velocity.y < 0 ) {
+                force.y -= playerStats.rb.velocity.y;
+            }
+
+            //Add a force to the player to jump off the wall
+            playerStats.rb.AddForce( force, ForceMode2D.Impulse );
+
+            jumpInput = false;
+            isWallJumping = true;
         }
     }
 
@@ -202,6 +254,14 @@ public class PlayerMovementController : MonoBehaviour
         && currentJumps < playerStats.numberOfJumps 
         //Check if it has been enough time between jumps
         && lastJumpTime > jumpWaitTime;
+    }
+
+    bool CanJumpCut() {
+        return !isWallJumping
+        //When we reach our peak jump height
+        && playerStats.rb.velocityY > 0 
+        //When we release the jump button
+        && jumpInputReleased;
     }
 
     #endregion

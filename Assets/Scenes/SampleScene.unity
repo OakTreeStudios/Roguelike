@@ -576,6 +576,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  wallCheck: {fileID: 1290896002}
 --- !u!4 &978988142
 Transform:
   m_ObjectHideFlags: 0
