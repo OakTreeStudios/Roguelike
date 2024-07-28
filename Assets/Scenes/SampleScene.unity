@@ -610,6 +610,8 @@ MonoBehaviour:
   currentHealth: 0
   movementSpeed: 9
   jumpForce: 5
+  wallJumpForce: 5
+  wallJumpLerp: 0.15
   numberOfJumps: 1
 --- !u!1 &1290895999
 GameObject:
@@ -646,7 +648,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 19a40fd5118ab5b4e878b4763fbf9a66, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
