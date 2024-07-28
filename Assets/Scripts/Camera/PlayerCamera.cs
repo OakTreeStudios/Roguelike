@@ -7,7 +7,7 @@ public class PlayerCamera : MonoBehaviour
 
     #region Camera Variables
     public Transform player;
-
+    public float cameraSpeed = 0.1f;
     private Vector3 targetPoint = Vector3.zero;
 
     #endregion
@@ -23,11 +23,12 @@ public class PlayerCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Update the camera's position
+        //Update the target point position
         targetPoint = player.position;
+        targetPoint.z = 0;
 
-        //Set the camera's position
-        transform.position = new Vector3(targetPoint.x, targetPoint.y, -1);
+        //Set the camera's position by linearly interpolating between the two positions
+        transform.position = Vector3.Lerp(transform.position, targetPoint, cameraSpeed * Time.deltaTime);
     }
     #endregion
 }
