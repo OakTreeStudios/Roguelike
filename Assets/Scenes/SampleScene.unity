@@ -1030,8 +1030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1290896002}
-  cameraSpeed: 4
-  lookAheadDistance: 5
+  cameraSpeed: 2.4
+  lookAheadDistance: 4.5
   lookAheadLerp: 0.8
 --- !u!1 &631940379
 GameObject:
