@@ -8,7 +8,7 @@ public class GenLevelCastle : MonoBehaviour
     //Starter Room
     public GameObject startRoom;
     //Break map into a grid
-    public int mapWidth = 5;
+    public int mapWidth = 10;
     public int mapHeight = 0;
     public int roomWidth = 30;
     public int roomHeight = 17;
@@ -32,7 +32,7 @@ public class GenLevelCastle : MonoBehaviour
         Debug.Log("|| LEVEL GENERATION ||");
 
         //Break map into a grid
-        for (int x = 0; x < mapWidth - 1; x++)
+        for (int x = 0; x < mapWidth ; x++)
         {
             //Always spawn Start Room at center of map
             if (x == 0)
@@ -46,7 +46,7 @@ public class GenLevelCastle : MonoBehaviour
             {
                 //Spawn a random room
                 Vector3 spawnPos = new Vector3(x * roomWidth, 0, 0);
-                GameObject room = rooms[rng.RandomInt(0, rooms.Count)];
+                GameObject room = rooms[rng.RandomInt(0, rooms.Count - 1)];
                 Instantiate(room, spawnPos, Quaternion.identity);
                 Debug.Log("|| SPAWNED ROOM " + room.name + " ||");
             }

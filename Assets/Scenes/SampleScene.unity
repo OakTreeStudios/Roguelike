@@ -4094,8 +4094,10 @@ MonoBehaviour:
   rooms:
   - {fileID: 994920723091688797, guid: 024623aee82a64e4295201a19eb01c94, type: 3}
   - {fileID: 3758062685849260794, guid: 0c70982a1e02910489d4649920d9a0c6, type: 3}
+  - {fileID: 7110972528418923304, guid: ada8750dba6f448408b5a959eeb34251, type: 3}
+  - {fileID: 5821820179303289349, guid: e9819136c0a6f7d4eb8225e8e62f2445, type: 3}
   startRoom: {fileID: 6377573639425768995, guid: 81d60b824c1c8fc46b912f0fd74e63b2, type: 3}
-  mapWidth: 5
+  mapWidth: 10
   mapHeight: 0
   roomWidth: 30
   roomHeight: 17
