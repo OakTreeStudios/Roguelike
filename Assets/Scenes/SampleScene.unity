@@ -4101,6 +4101,7 @@ MonoBehaviour:
   mapHeight: 0
   roomWidth: 30
   roomHeight: 17
+  levelSeed: 100
 --- !u!4 &2027009958
 Transform:
   m_ObjectHideFlags: 0

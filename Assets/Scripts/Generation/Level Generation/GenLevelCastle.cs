@@ -13,13 +13,13 @@ public class GenLevelCastle : MonoBehaviour
     public int roomWidth = 30;
     public int roomHeight = 17;
     
-    public const int CASTLESEED = 100;
+    public uint levelSeed = 100;
     // Start is called before the first frame update
     void Start()
     {
         //Seed our random number generator
         //Eventually we will want to seed this with a level seed
-        RandomNumber rng = new RandomNumber(CASTLESEED);
+        RandomNumber rng = new RandomNumber(levelSeed);
 
         //Generate a random number
         Debug.Log("|| RANDOM NUMBER TESTS ||");
