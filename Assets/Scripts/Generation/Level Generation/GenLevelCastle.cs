@@ -19,7 +19,8 @@ public class GenLevelCastle : MonoBehaviour
     {
         //Seed our random number generator
         //Eventually we will want to seed this with a level seed
-        RandomNumber rng = new RandomNumber(levelSeed);
+        RandomNumber rng = new RandomNumber();
+        rng.Initialize(levelSeed);
 
         //Generate a random number
         Debug.Log("|| RANDOM NUMBER TESTS ||");
@@ -46,9 +47,11 @@ public class GenLevelCastle : MonoBehaviour
             {
                 //Spawn a random room
                 Vector3 spawnPos = new Vector3(x * roomWidth, 0, 0);
-                GameObject room = rooms[rng.RandomInt(0, rooms.Count - 1)];
+                int roomIndex = rng.RandomInt(0, rooms.Count - 1);
+                Debug.Log(roomIndex);
+                GameObject room = rooms[roomIndex];
                 Instantiate(room, spawnPos, Quaternion.identity);
-                Debug.Log("|| SPAWNED ROOM " + room.name + " ||");
+                Debug.Log("|| SPAWNED ROOM " + room.name + " | With Index: " + roomIndex + " ||");
             }
         }
 

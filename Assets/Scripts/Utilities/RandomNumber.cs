@@ -12,8 +12,8 @@ public class RandomNumber : MonoBehaviour
     //Internal State of the Random Number Generator
     private uint state;
 
-    //Constructor
-    public RandomNumber(uint seed)
+    //Initialization method
+    public void Initialize(uint seed)
     {
         //Check for invalid input
         if(seed == 0) throw new ArgumentException("|| RandomNumber || Seed cannot be 0, please choose a number greater than 0");
@@ -35,7 +35,7 @@ public class RandomNumber : MonoBehaviour
     {
         //Check for invalid input
         if(min >= max) throw new ArgumentException("|| RandomNumber || Min must be less than Max!");
-        return RandomInt() % (max - min) + min;
+        return min + Math.Abs(RandomInt()) % (max - min);
     }
 
     public float RandomFloat() 
@@ -47,7 +47,7 @@ public class RandomNumber : MonoBehaviour
     {
         //Check for invalid input
         if(min >= max) throw new ArgumentException("|| RandomNumber || Min must be less than Max!");
-        return RandomFloat() * (max - min) + min;
+        return min + Math.Abs(RandomFloat()) * (max - min);
     }
 
 }
