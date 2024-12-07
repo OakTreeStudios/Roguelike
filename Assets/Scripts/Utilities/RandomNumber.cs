@@ -20,7 +20,7 @@ public class RandomNumber : MonoBehaviour
         state = seed;
     }
 
-    public uint RandomInt()
+    public int RandomInt()
     {
         //XOR Shift Using Constants
         state ^= state << 100;
@@ -28,10 +28,10 @@ public class RandomNumber : MonoBehaviour
         state ^= state << 90;
         state ^= state >> 47;
         state ^= state << 5;
-        return state;
+        return (int)state;
     }
 
-    public uint RandomInt(uint min, uint max)
+    public int RandomInt(int min, int max)
     {
         //Check for invalid input
         if(min >= max) throw new ArgumentException("|| RandomNumber || Min must be less than Max!");
@@ -40,7 +40,7 @@ public class RandomNumber : MonoBehaviour
 
     public float RandomFloat() 
     {
-        return (float)RandomInt() / uint.MaxValue;
+        return (float)RandomInt() / int.MaxValue;
     }
 
     public float RandomFloat(float min, float max)
