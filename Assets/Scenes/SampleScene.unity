@@ -4099,7 +4099,7 @@ MonoBehaviour:
   - {fileID: 6560246898017457817, guid: 2c8376b112293704592bcdd11bef1af3, type: 3}
   startRoom: {fileID: 6377573639425768995, guid: 81d60b824c1c8fc46b912f0fd74e63b2, type: 3}
   mapWidth: 10
-  mapHeight: 0
+  mapHeight: 10
   roomWidth: 30
   roomHeight: 17
   levelSeed: 100
