@@ -66,10 +66,22 @@ public class LevelGrid : MonoBehaviour
         
         //Spawn Snake
         LevelGridSnake snake = new LevelGridSnake(gridWidth, gridHeight, 1, midY, ref rng);
-        snake.MoveRandom();
-        snake.MoveRandom();
-        snake.MoveRandom();
-        snake.MoveRandom();
+
+        //Here we want to verify that the chosen direction is valid
+        //If it is not, we want to choose a new direction
+
+        Vector2Int direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
+        direction = snake.ChooseRandomDirection();
     }
 
     //Initializer for the grid
