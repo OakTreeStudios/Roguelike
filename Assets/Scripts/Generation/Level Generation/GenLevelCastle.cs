@@ -22,8 +22,13 @@ public class GenLevelCastle : MonoBehaviour
         grid.SetRoomList(rooms);
         grid.SetStartRoom(startRoom);
 
-        grid.GenerateGrid(levelSeed);
-        grid.SpawnGrid();
+        //grid.GenerateGrid(levelSeed);
+
+        //Snake Generation Test
+        grid.SnakeGeneration(levelSeed);
+        
+
+        //grid.SpawnGrid();
 
     }
 }

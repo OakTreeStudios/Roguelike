@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,8 @@ public class LevelGrid : MonoBehaviour
     public int roomWidth = 30;
     public int roomHeight = 17;
 
+    public RandomNumber rng;
+
 
     //2D array represnting our rooms
     public GameObject[,] grid;
@@ -32,6 +35,43 @@ public class LevelGrid : MonoBehaviour
     #endregion
 
     #region Methods
+    //Method of using the snake method to place rooms.
+    public void SnakeGeneration(uint seed)
+    {
+        //To Do: Implement Snake Generation
+
+        //Idea:
+        //Do this in two passes
+        //First pass: Spawn snakes
+        //Second pass: Determine how rooms are connected.
+
+        //Psuedo Code:
+        //1. Mark middle left corner of grid as start room
+        //2. Spawn snake to right of start room
+            //a. Snakes move in a random direction if it is valid
+            //b. If snake can't move in any direction, it dies
+            //c. Snake has a small percentage to spawn a new snake
+            //d. Snake has a small percentage to die
+        //3. Wait until all snakes are dead.
+        
+        //Seed our random number generator
+        RandomNumber rng = new RandomNumber();
+        rng.Initialize(seed);
+
+        //Calculate center of y-axis
+        int midY = gridHeight / 2;
+        
+        //Spawn Start Room at midy, 0
+        grid[0, midY] = startRoom;
+        
+        //Spawn Snake
+        LevelGridSnake snake = new LevelGridSnake(gridWidth, gridHeight, 1, midY, ref rng);
+        snake.MoveRandom();
+        snake.MoveRandom();
+        snake.MoveRandom();
+        snake.MoveRandom();
+    }
+
     //Initializer for the grid
     public void Initialize(int gridWidth, int gridHeight)
     {
