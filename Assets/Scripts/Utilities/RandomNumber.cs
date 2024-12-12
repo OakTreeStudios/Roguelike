@@ -27,11 +27,9 @@ public class RandomNumber : MonoBehaviour
     public int RandomInt()
     {
         //XOR Shift Using Constants
-        state ^= state << 100;
-        state ^= state >> 36;
-        state ^= state << 90;
-        state ^= state >> 47;
-        state ^= state << 5;
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
         return (int)state;
     }
 
