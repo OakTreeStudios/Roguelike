@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 #region LevelGrid Class
@@ -29,8 +30,18 @@ public class LevelGrid : MonoBehaviour
     //List of rooms that can be spawned
     public List<GameObject> rooms;
 
+    //List of Snakes
+    public List<LevelGridSnake> snakeList = new List<LevelGridSnake>();
+
     //Starter Room
     public GameObject startRoom;
+
+    float chanceToSpawnSnake = 0.05f;
+    float chanceToDieSnake = 0.2f;
+    int maxSnakes = 3;
+
+    int numCurrentRooms = 0;
+    float maxRoomPercentage = 0.75f;
 
     #endregion
 
@@ -56,32 +67,68 @@ public class LevelGrid : MonoBehaviour
         
         //Seed our random number generator
         RandomNumber rng = new RandomNumber();
-        rng.Initialize(seed);
+        //delta time
+        //Seed time to current time
+        uint deltaTime = BitConverter.ToUInt32(BitConverter.GetBytes(DateTime.Now.Ticks), 0);
+        Debug.Log("|| DELTA TIME || " + deltaTime);
+        rng.Initialize(deltaTime);
 
-        //Calculate center of y-axis
-        int midY = gridHeight / 2;
-        
-        //Spawn Start Room at midy, 0
-        grid[0, midY] = startRoom;
+        grid[0, 0] = startRoom;
         
         //Spawn Snake
-        LevelGridSnake snake = new LevelGridSnake(gridWidth, gridHeight, 1, midY, ref rng);
+        snakeList.Add( new LevelGridSnake(gridWidth, gridHeight, 1, 0, ref rng, ref grid) );
+        grid[1, 0] = startRoom;
 
-        //Here we want to verify that the chosen direction is valid
-        //If it is not, we want to choose a new direction
+        numCurrentRooms = 2;
 
-        Vector2Int direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
-        direction = snake.ChooseRandomDirection();
+        //While there are still snakes or number of rooms does not exceed grid size perecentage
+        //while (snakeList.Count > 0 && numCurrentRooms < (gridWidth * gridHeight) * maxRoomPercentage)
+        for (int iteration = 0; iteration < 100; iteration++) // Limit iterations to prevent infinite loop during testing
+        {
+            //Iterate through snakes
+            for (int i = 0; i < snakeList.Count; i++)
+            {
+                //Get current snake
+                LevelGridSnake currSnake = snakeList[i];
+                Debug.Log("|| SNAKE " + i + " ||");
+
+                //Check if this snake should die.
+
+                //Check if this snake should spawn a new snake
+
+                //Check where we can move next
+                currSnake.CheckDirection();
+
+                //Move the snake in a valid random direction
+                currSnake.MoveSnake();
+                
+                //Check if snake is alive
+                if(!currSnake.IsAlive())
+                {
+                    //Snake is dead, remove it from the list
+                    snakeList.RemoveAt(i);
+                    i--; // Adjust index since we removed an element
+                    Debug.Log("|| SNAKE " + i + " DIED ||");
+                    continue;
+                } else {
+                    //Mark location with room
+                    grid[currSnake.GetCurrCoords().x, currSnake.GetCurrCoords().y] = startRoom;
+                }
+                
+
+                Debug.Log(currSnake.GetCurrCoords().x + " " + currSnake.GetCurrCoords().y);
+                currSnake.printDirections();
+
+            }
+            Debug.Log("~~ Iterations: " + iteration + " ~~");
+            //Check if all sankes have died
+            if(snakeList.Count ==0)
+            {
+                Debug.Log("|| ALL SNAKES DEAD ||");
+                break;
+            }
+        }
+        
     }
 
     //Initializer for the grid
@@ -144,17 +191,15 @@ public class LevelGrid : MonoBehaviour
     public void SpawnGrid()
     {
         //To Do: Needs optimizaion currently O(n^2)
-
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
             {
                 Vector3 spawnPos = new Vector3(x * roomWidth, y * roomHeight, 0);
-                GameObject room = grid[x, y];
-
                 //Check if there is a room to spawn
-                if(room != null) {
-                    Instantiate(room, spawnPos, Quaternion.identity);
+                if(grid[x,y] != null) {
+                    //Debug.Log("|| SPAWNED ROOM " + grid[x,y].name + " ||");
+                    Instantiate(grid[x,y], spawnPos, Quaternion.identity);
                 }
             }
         }

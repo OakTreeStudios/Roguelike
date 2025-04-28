@@ -26,9 +26,8 @@ public class GenLevelCastle : MonoBehaviour
 
         //Snake Generation Test
         grid.SnakeGeneration(levelSeed);
-        
 
-        //grid.SpawnGrid();
+        grid.SpawnGrid();
 
     }
 }

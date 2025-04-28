@@ -2,98 +2,156 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
+using Unity.VisualScripting;
 using UnityEngine;
 
 //Snake Class for generating a level grid
 public class LevelGridSnake : MonoBehaviour
 {
-    Vector2Int coords;
+    Vector2Int PrevCoords, CurrCoords;
     int gridWidth, gridHeight;
-    float chanceToSpawn = 0.1f;
-    float chanceToDie = 0.1f;
+    GameObject[,] levelGrid;
 
     RandomNumber rng;
 
-    public LevelGridSnake(int width, int height, int spawnX, int spawnY, ref RandomNumber rng)
+    bool alive = true;
+    bool Up = false;
+    bool Down = false;
+    bool Left = false;
+    bool Right = false;
+
+    public LevelGridSnake(int width, int height, int spawnX, int spawnY, ref RandomNumber rng, ref GameObject[,] levelGrid)
     {
         gridWidth = width;
         gridHeight = height;
-        coords = new Vector2Int(spawnX, spawnY);
+        PrevCoords = new Vector2Int(spawnX, spawnY);
+        CurrCoords = new Vector2Int(spawnX, spawnY);
         this.rng = rng;
+        this.levelGrid = levelGrid;
     }
 
-    public void SetCoords(int x, int y)
+    private void printGrid()
     {
-        this.coords = new Vector2Int(x, y);
-    }
-    public Vector2Int MoveRight()
-    {
-        int x = coords.x + 1;
-        if (x >= gridWidth)
+        for (int x = 0; x < gridWidth; x++)
         {
-            return new Vector2Int(gridWidth -1, coords.y);
+            for (int y = 0; y < gridHeight; y++)
+            {
+                if (levelGrid[x, y] == null)
+                {
+                    Debug.Log("|| EMPTY ||");
+                }
+                else
+                {
+                    Debug.Log("|| ROOM ||");
+                }
+            }
+        }
+    }
+
+    public void SetCurrCoords(int x, int y)
+    {
+        CurrCoords = new Vector2Int(x, y);
+    }
+    
+    public void SetPrevCoords(int x, int y)
+    {
+        PrevCoords = new Vector2Int(x, y);
+    }
+
+    public Vector2Int GetCurrCoords()
+    {
+        return CurrCoords;
+    }
+
+    public Vector2Int GetPrevCoords()
+    {
+        return PrevCoords;
+    }
+
+    public void CheckDirection()
+    {
+        //Check if we are at the edge of the grid or gird already has a room
+        if (CurrCoords.x - 1 < 0 || levelGrid[CurrCoords.x - 1, CurrCoords.y] != null)
+        {
+            Left = false;
+        }
+        else
+        {
+            Left = true;
         }
 
-        return new Vector2Int(x, coords.y);
-    }
-
-    public Vector2Int MoveLeft()
-    {
-        int x = coords.x - 1;
-        if (x < 0)
+        //Check Right
+        if (CurrCoords.x + 1 >= gridWidth || levelGrid[CurrCoords.x + 1, CurrCoords.y] != null)
         {
-            return new Vector2Int(0, coords.y);
+            Right = false;
+        }
+        else
+        {
+            Right = true;
         }
 
-        return new Vector2Int(x, coords.y);
-    }
-
-    public Vector2Int MoveUp()
-    {
-        int y = coords.y + 1;
-        if (y >= gridHeight)
+        //Check Up
+        if ( CurrCoords.y + 1 >= gridHeight || levelGrid[CurrCoords.x, CurrCoords.y + 1] != null)
         {
-            return new Vector2Int(coords.x, gridHeight - 1);
+            Up = false;
+        }
+        else
+        {
+            Up = true;
         }
 
-        return new Vector2Int(coords.x, y);
+        //Check Down
+        if (CurrCoords.y - 1 < 0 || levelGrid[CurrCoords.x, CurrCoords.y - 1] != null) 
+        {
+            Down = false;
+        }
+        else
+        {
+            Down = true;
+        }
     }
 
-    public Vector2Int MoveDown()
+    //Move the snake in a random direction
+    public void MoveSnake()
     {
-        int y = coords.y - 1;
-        if (y < 0)
+        //Check if we can move in any direction
+        if (!Up && !Down && !Left && !Right)
         {
-            return new Vector2Int(coords.x, 0);
+            alive = false;
+            Debug.Log("|| SNAKE DIED ||");
+            return;
         }
 
-        return new Vector2Int(coords.x, y);
+        //Create a list of possible directions to move
+        List<Vector2Int> possibleDirections = new List<Vector2Int>();
+
+        if (Up) possibleDirections.Add(new Vector2Int(0, 1));
+        if (Down) possibleDirections.Add(new Vector2Int(0, -1));
+        if (Left) possibleDirections.Add(new Vector2Int(-1, 0));
+        if (Right) possibleDirections.Add(new Vector2Int(1, 0));
+
+        //Select a random direction from the list
+        int randomIndex = rng.RandomInt(0, possibleDirections.Count);
+        Vector2Int direction = possibleDirections[randomIndex];
+
+        //Update previous coordinates
+        SetPrevCoords(CurrCoords.x, CurrCoords.y);
+
+        //Move the snake in the selected direction
+        CurrCoords += direction;
+
+        //Debug.Log("|| SNAKE MOVED TO: " + CurrCoords.x + ", " + CurrCoords.y + " ||");
     }
 
-    public Vector2Int ChooseRandomDirection()
+    public void printDirections()
     {
-        int direction = rng.RandomInt(0, 4);
-        Vector2Int moveCoords = new Vector2Int();
-        switch (direction)
-        {
-            case 0:
-                moveCoords = MoveRight();
-                Debug.Log("|| MOVED RIGHT: " + moveCoords.x + ", " + moveCoords.y + " ||");
-                break;
-            case 1:
-                moveCoords = MoveLeft();
-                Debug.Log("|| MOVED LEFT: " + moveCoords.x + ", " + moveCoords.y + " ||");
-                break;
-            case 2:
-                moveCoords = MoveUp();
-                Debug.Log("|| MOVED UP: " + moveCoords.x + ", " + moveCoords.y + " ||");
-                break;
-            case 3:
-                moveCoords = MoveDown();
-                Debug.Log("|| MOVED DOWN: " + moveCoords.x + ", " + moveCoords.y + " ||");
-                break;
-        }
-        
-        return moveCoords;
+        Debug.Log("|| UP: " + Up + " || DOWN: " + Down + " || LEFT: " + Left + " || RIGHT: " + Right + " ||");
+    }
+
+    public bool IsAlive() 
+    {
+        return alive;
     }
 }
+    
+    
